@@ -154,8 +154,6 @@ const SideMenu = ({
     { id: 'analytics', label: 'Analytics', icon: BarChart2 },
     { id: 'pricing', label: 'Subscription Plan', icon: CreditCard },
     { id: 'settings', label: 'Settings', icon: Settings },
-    { id: 'faqs', label: 'FAQs', icon: MessageCircle },
-    { id: 'help', label: 'Help & Support', icon: HelpCircle },
   ];
 
   return (
@@ -180,54 +178,44 @@ const SideMenu = ({
             )}
           >
             <div className={cn(
-              "p-6 border-b relative overflow-hidden",
+              "p-5 border-b relative overflow-hidden",
               isDarkMode ? "border-gray-800" : "border-gray-100"
             )}>
-              <div className="flex items-center gap-4 relative z-10">
+              <div className="flex items-center gap-3 relative z-10">
                 <div className={cn(
-                  "w-16 h-16 rounded-2xl overflow-hidden shadow-sm border shrink-0",
+                  "w-12 h-12 rounded-xl overflow-hidden shadow-sm border shrink-0",
                   isDarkMode ? "bg-gray-800 border-gray-700" : "bg-gray-100 border-gray-100"
                 )}>
                   <img src="https://picsum.photos/seed/user/100/100" alt="Profile" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h2 className={cn(
-                    "text-lg font-bold truncate",
+                    "text-base font-bold truncate",
                     isDarkMode ? "text-white" : "text-gray-900"
                   )}>Aman Sharma</h2>
                   <p className={cn(
-                    "text-xs font-medium truncate mb-2",
+                    "text-[10px] font-medium leading-tight",
                     isDarkMode ? "text-gray-400" : "text-gray-500"
                   )}>aman.sharma@example.com</p>
                   
-                  <div className="flex flex-col gap-2">
-                    <div className={cn(
-                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border w-fit",
-                      isPro 
-                        ? (isDarkMode ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border-emerald-100")
-                        : (isDarkMode ? "bg-gray-800 text-gray-400 border-gray-700" : "bg-gray-100 text-gray-600 border-gray-200")
-                    )}>
-                      {isPro ? <Zap size={12} fill="currentColor" /> : <Activity size={12} />}
-                      {isPro ? "Pro Plan" : "Free Plan"}
-                    </div>
-                    {!isPro && (
-                      <button 
-                        onClick={() => onNavigate('pricing')}
-                        className="mt-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all active:scale-95 shadow-sm shadow-emerald-500/20 w-fit"
-                      >
-                        Buy Pro Plan
-                      </button>
-                    )}
+                  <div className={cn(
+                    "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border w-fit mt-1",
+                    isPro 
+                      ? (isDarkMode ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30" : "bg-emerald-50 text-emerald-700 border-emerald-100")
+                      : (isDarkMode ? "bg-gray-800 text-gray-400 border-gray-700" : "bg-gray-100 text-gray-600 border-gray-200")
+                  )}>
+                    {isPro ? <Zap size={10} fill="currentColor" /> : <Activity size={10} />}
+                    {isPro ? "Pro Plan" : "Free Plan"}
                   </div>
                 </div>
                 <button 
                   onClick={onClose} 
                   className={cn(
-                    "p-2 rounded-xl active:scale-95 transition-all self-start",
+                    "p-1.5 rounded-lg active:scale-95 transition-all self-start",
                     isDarkMode ? "text-gray-500 hover:bg-gray-800" : "text-gray-400 hover:bg-gray-50"
                   )}
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
             </div>
@@ -251,6 +239,30 @@ const SideMenu = ({
                   <span className="text-sm font-semibold">{item.label}</span>
                 </button>
               ))}
+
+              {!isPro && (
+                <div className="px-4 mt-4">
+                  <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-4 text-white shadow-lg shadow-emerald-500/20 relative overflow-hidden">
+                    <div className="relative z-10">
+                      <h4 className="font-bold text-sm mb-1">Unlock All Tests</h4>
+                      <p className="text-[10px] text-emerald-50 leading-tight mb-3">
+                        Get Pro Plan for just <span className="font-bold">₹299</span> <span className="line-through opacity-60">₹999</span>. 
+                        That's less than ₹10 per test!
+                      </p>
+                      <button 
+                        onClick={() => {
+                          onNavigate('pricing');
+                          onClose();
+                        }}
+                        className="w-full bg-white text-emerald-700 py-2 rounded-xl text-[10px] font-bold active:scale-95 transition-transform shadow-sm"
+                      >
+                        Upgrade Now
+                      </button>
+                    </div>
+                    <Zap size={60} className="absolute -right-4 -bottom-4 text-white/10 rotate-12" />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className={cn(
@@ -986,7 +998,7 @@ const TestHistoryScreen = ({ onBack }: { onBack: () => void }) => (
   </div>
 );
 
-const SettingsScreen = ({ onBack, isDarkMode, toggleDarkMode }: { onBack: () => void, isDarkMode: boolean, toggleDarkMode: () => void }) => (
+const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode }: { onBack: () => void, onNavigate: (s: Screen) => void, isDarkMode: boolean, toggleDarkMode: () => void }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
     <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-100 flex items-center gap-4">
       <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
@@ -1045,12 +1057,33 @@ const SettingsScreen = ({ onBack, isDarkMode, toggleDarkMode }: { onBack: () => 
             </div>
             <ChevronRight size={18} className="text-gray-300" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors">
+        </Card>
+      </section>
+
+      <section>
+        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Support</h3>
+        <Card className="divide-y divide-gray-50 p-0 overflow-hidden">
+          <button 
+            onClick={() => onNavigate('faqs')}
+            className="w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors"
+          >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-                <Lock size={18} />
+                <MessageCircle size={18} />
               </div>
-              <span className="text-sm font-semibold text-gray-700">Change Password</span>
+              <span className="text-sm font-semibold text-gray-700">FAQs</span>
+            </div>
+            <ChevronRight size={18} className="text-gray-300" />
+          </button>
+          <button 
+            onClick={() => onNavigate('help')}
+            className="w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                <HelpCircle size={18} />
+              </div>
+              <span className="text-sm font-semibold text-gray-700">Help & Support</span>
             </div>
             <ChevronRight size={18} className="text-gray-300" />
           </button>
@@ -1458,55 +1491,82 @@ const FocusAreaScreen = ({ onMenuClick }: { onMenuClick: () => void }) => (
   </div>
 );
 
-const PricingScreen = ({ onBack }: { onBack: () => void }) => (
-  <div className="fixed inset-0 bg-white z-[110] flex flex-col p-6">
-    <button onClick={onBack} className="mb-6"><ArrowLeft size={24} /></button>
-    
-    <div className="flex-1">
-      <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Zap className="text-emerald-600" size={32} />
+const PricingScreen = ({ onBack }: { onBack: () => void }) => {
+  const [isSuccess, setIsSuccess] = React.useState(false);
+
+  if (isSuccess) {
+    return (
+      <div className="fixed inset-0 bg-white z-[110] flex flex-col items-center justify-center p-8 text-center">
+        <div className="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+          <CheckCircle2 size={48} />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Unlock Full Series</h1>
-        <p className="text-gray-500 text-sm">Get access to all 30 full-length mock tests and advanced analytics.</p>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Upgrade Successful!</h1>
+        <p className="text-gray-500 mb-8">Welcome to the Pro Plan. You now have unlimited access to all tests and analytics.</p>
+        <button 
+          onClick={onBack}
+          className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 bg-white z-[110] flex flex-col p-6">
+      <button onClick={onBack} className="mb-6 self-start"><ArrowLeft size={24} /></button>
+      
+      <div className="flex-1 overflow-y-auto no-scrollbar">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Zap className="text-emerald-600" size={32} />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Unlock Full Series</h1>
+          <p className="text-gray-500 text-sm">Get access to all 30 full-length mock tests and advanced analytics.</p>
+        </div>
+
+        <div className="space-y-4 mb-8">
+          {[
+            '30 Full-Length Mock Tests',
+            'Real Exam Interface Simulation',
+            'AI-Powered Rank Prediction',
+            'Detailed Subject-wise Analysis',
+            'Weak Topic Detection',
+            'Valid till NEET 2026 Exam'
+          ].map((feat, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <CheckCircle2 size={20} className="text-emerald-600" />
+              <span className="text-sm text-gray-700 font-medium">{feat}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 mb-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Special Offer</p>
+              <h3 className="text-3xl font-bold text-gray-900">₹299</h3>
+            </div>
+            <div className="text-right">
+              <p className="text-sm line-through text-gray-400">₹999</p>
+              <p className="text-xs font-bold text-emerald-600">70% OFF</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-4 mb-8">
-        {[
-          '30 Full-Length Mock Tests',
-          'Real Exam Interface Simulation',
-          'AI-Powered Rank Prediction',
-          'Detailed Subject-wise Analysis',
-          'Weak Topic Detection',
-          'Valid till NEET 2026 Exam'
-        ].map((feat, i) => (
-          <div key={i} className="flex items-center gap-3">
-            <CheckCircle2 size={20} className="text-emerald-600" />
-            <span className="text-sm text-gray-700 font-medium">{feat}</span>
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 mb-8">
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Special Offer</p>
-            <h3 className="text-3xl font-bold text-gray-900">₹299</h3>
-          </div>
-          <div className="text-right">
-            <p className="text-sm line-through text-gray-400">₹999</p>
-            <p className="text-xs font-bold text-emerald-600">70% OFF</p>
-          </div>
-        </div>
+      <div className="pt-4">
+        <button 
+          onClick={() => setIsSuccess(true)}
+          className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform"
+        >
+          Buy Now
+        </button>
+        <p className="text-center text-[10px] text-gray-400 mt-4">Secure payment via UPI, Cards, or NetBanking</p>
       </div>
     </div>
-
-    <button className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform">
-      Buy Now
-    </button>
-    <p className="text-center text-[10px] text-gray-400 mt-4">Secure payment via UPI, Cards, or NetBanking</p>
-  </div>
-);
+  );
+};
 
 // --- Main App ---
 
@@ -1538,10 +1598,9 @@ export default function App() {
       case 'focus-area': return <FocusAreaScreen onMenuClick={() => setIsMenuOpen(true)} />;
       case 'pricing': return <PricingScreen onBack={() => setCurrentScreen('test-list')} />;
       case 'history': return <TestHistoryScreen onBack={() => setCurrentScreen('dashboard')} />;
-      case 'settings': return <SettingsScreen onBack={() => setCurrentScreen('dashboard')} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} />;
-      case 'faqs': return <FaqsScreen onBack={() => setCurrentScreen('dashboard')} />;
-      case 'help': return <HelpScreen onBack={() => setCurrentScreen('dashboard')} />;
-      case 'profile': return <SettingsScreen onBack={() => setCurrentScreen('dashboard')} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} />;
+      case 'settings': return <SettingsScreen onNavigate={setCurrentScreen} onBack={() => setCurrentScreen('dashboard')} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} />;
+      case 'faqs': return <FaqsScreen onBack={() => setCurrentScreen('settings')} />;
+      case 'help': return <HelpScreen onBack={() => setCurrentScreen('settings')} />;
       default: return <DashboardScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
     }
   };

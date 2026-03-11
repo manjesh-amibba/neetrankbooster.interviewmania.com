@@ -336,6 +336,13 @@ const TestInstructionsScreen = ({ onStart, onBack }: { onStart: () => void, onBa
     </div>
 
     <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <button 
+        onClick={onStart}
+        className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform mb-2"
+      >
+        Start Test
+      </button>
+
       <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
         <h3 className="font-bold text-emerald-900 mb-4">Exam Overview</h3>
         <div className="grid grid-cols-2 gap-4">
@@ -390,65 +397,56 @@ const TestInstructionsScreen = ({ onStart, onBack }: { onStart: () => void, onBa
         </p>
       </div>
     </div>
-
-    <div className="p-6 border-t border-gray-100">
-      <button 
-        onClick={onStart}
-        className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform"
-      >
-        Start Test
-      </button>
-    </div>
   </div>
 );
 
 const OnboardingScreen = ({ onLogin }: { onLogin: () => void }) => (
-  <div className="min-h-screen bg-white flex flex-col p-8 justify-between">
-    <div className="mt-12 text-center">
-      <div className="w-20 h-20 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-        <Target className="text-emerald-600" size={40} />
+  <div className="h-screen bg-white flex flex-col p-6 justify-between overflow-hidden">
+    <div className="mt-4 text-center">
+      <div className="w-16 h-16 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
+        <Target className="text-emerald-600" size={32} />
       </div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">NEET Rank Booster</h1>
-      <p className="text-gray-500 font-medium">Practice. Improve. Rank Higher.</p>
+      <h1 className="text-2xl font-bold text-gray-900 mb-1">NEET Rank Booster</h1>
+      <p className="text-sm text-gray-500 font-medium">Practice. Improve. Rank Higher.</p>
     </div>
 
-    <div className="space-y-6">
+    <div className="flex-1 flex flex-col justify-center space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
-            <User size={20} />
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
+            <User size={16} />
           </div>
-          <p className="text-sm text-gray-600 font-medium">Created by previous NEET Rankers</p>
+          <p className="text-xs text-gray-600 font-medium">Created by previous NEET Rankers</p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
-            <Zap size={20} />
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
+            <Zap size={16} />
           </div>
-          <p className="text-sm text-gray-600 font-medium">Every Test Brings You Closer to Your Rank</p>
+          <p className="text-xs text-gray-600 font-medium">Every Test Brings You Closer to Your Rank</p>
         </div>
       </div>
 
-      <div className="space-y-4 pt-4">
-        <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-          <div className="flex items-center gap-3 mb-1">
-            <Clock size={18} className="text-emerald-600" />
-            <span className="font-bold text-emerald-900">{getDaysLeft()} Days Left</span>
-          </div>
-          <p className="text-xs text-emerald-700">Target: May 3, 2026. Time to accelerate your prep.</p>
+      <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100">
+        <div className="flex items-center gap-2 mb-0.5">
+          <Clock size={16} className="text-emerald-600" />
+          <span className="font-bold text-emerald-900 text-sm">{getDaysLeft()} Days Left</span>
         </div>
-
-        <button 
-          onClick={onLogin}
-          className="w-full bg-white border border-gray-200 py-4 rounded-2xl flex items-center justify-center gap-3 active:bg-gray-50 transition-colors shadow-sm"
-        >
-          <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
-          <span className="font-semibold text-gray-700">Continue with Google</span>
-        </button>
-        
-        <p className="text-[10px] text-center text-gray-400 px-4 leading-relaxed">
-          By continuing, you agree to our <button className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-2">Terms of Service</button> and <button className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-2">Privacy Policy</button>.
-        </p>
+        <p className="text-[10px] text-emerald-700">Target: May 3, 2026. Time to accelerate.</p>
       </div>
+    </div>
+
+    <div className="space-y-3 pb-2">
+      <button 
+        onClick={onLogin}
+        className="w-full bg-white border border-gray-200 py-3 rounded-2xl flex items-center justify-center gap-3 active:bg-gray-50 transition-colors shadow-sm"
+      >
+        <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4" />
+        <span className="font-semibold text-sm text-gray-700">Continue with Google</span>
+      </button>
+      
+      <p className="text-[9px] text-center text-gray-400 px-4 leading-relaxed">
+        By continuing, you agree to our <button className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-1">Terms</button> and <button className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-1">Privacy</button>.
+      </p>
     </div>
   </div>
 );
@@ -782,6 +780,34 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
           animate={{ width: `${((currentQuestion + 1) / 200) * 100}%` }}
           className="h-full bg-emerald-500"
         />
+      </div>
+
+      {/* Section Jump Navigation */}
+      <div className="bg-white border-b border-gray-100 flex overflow-x-auto no-scrollbar px-4 py-2 gap-2">
+        {[
+          { name: 'Physics', start: 0 },
+          { name: 'Chemistry', start: 50 },
+          { name: 'Biology', start: 100 },
+        ].map((section) => {
+          const isActive = currentQuestion >= section.start && currentQuestion < (section.start + 50 || 200);
+          return (
+            <button
+              key={section.name}
+              onClick={() => {
+                setCurrentQuestion(section.start);
+                setSelectedOption(userAnswers[section.start] ?? null);
+              }}
+              className={cn(
+                "px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap transition-all",
+                isActive 
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20" 
+                  : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+              )}
+            >
+              {section.name}
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex-1 flex overflow-hidden">

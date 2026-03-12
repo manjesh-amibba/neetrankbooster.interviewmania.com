@@ -52,7 +52,7 @@ import { cn, predictNeetRank, getDaysLeft } from './lib/utils';
 
 // --- Types ---
 
-type Screen = 'onboarding' | 'dashboard' | 'test-list' | 'test-instructions' | 'test-interface' | 'analytics' | 'focus-area' | 'pricing' | 'history' | 'settings' | 'faqs' | 'help';
+type Screen = 'onboarding' | 'dashboard' | 'test-list' | 'test-instructions' | 'test-interface' | 'analytics' | 'focus-area' | 'pricing' | 'history' | 'settings' | 'faqs' | 'help' | 'privacy-policy' | 'terms-of-service' | 'test-analysis';
 
 interface Question {
   id: number;
@@ -116,17 +116,25 @@ const MOCK_QUESTIONS: Question[] = [
 
 // --- Components ---
 
-const Header = ({ onMenuClick }: { onMenuClick: () => void }) => (
+const Header = ({ onMenuClick, onNavigate }: { onMenuClick: () => void, onNavigate?: (s: Screen) => void }) => (
   <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-50 flex justify-between items-center">
     <div className="flex items-center gap-3">
       <button onClick={onMenuClick} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
         <Menu size={24} />
       </button>
-      <h1 className="text-lg font-bold text-gray-900">NEET Rank Booster</h1>
+      <button 
+        onClick={() => onNavigate?.('dashboard')}
+        className="text-lg font-bold text-gray-900 active:opacity-70 transition-opacity"
+      >
+        NEET Rank Booster
+      </button>
     </div>
-    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden">
+    <button 
+      onClick={() => onNavigate?.('settings')}
+      className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden active:scale-95 transition-transform"
+    >
       <img src="https://picsum.photos/seed/user/100/100" alt="Profile" referrerPolicy="no-referrer" />
-    </div>
+    </button>
   </div>
 );
 
@@ -340,21 +348,17 @@ const Card = ({ children, className, ...props }: React.ComponentProps<'div'>) =>
 
 // --- Screens ---
 
-const TestInstructionsScreen = ({ onStart, onBack }: { onStart: () => void, onBack: () => void }) => (
-  <div className="min-h-screen bg-white flex flex-col">
-    <div className="p-6 border-b border-gray-100 flex items-center gap-4">
-      <button onClick={onBack} className="p-1"><ArrowLeft size={24} /></button>
-      <h1 className="text-xl font-bold text-gray-900">Test Instructions</h1>
+const TestInstructionsScreen = ({ onStart, onBack, onNavigate, onMenuClick }: { onStart: () => void, onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+  <div className="pb-24 bg-gray-50 min-h-screen">
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
+      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
+        <ArrowLeft size={24} />
+      </button>
+      <h1 className="text-lg font-bold text-gray-900">Test Instructions</h1>
     </div>
 
     <div className="flex-1 overflow-y-auto p-6 space-y-6">
-      <button 
-        onClick={onStart}
-        className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform mb-2"
-      >
-        Start Test
-      </button>
-
       <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
         <h3 className="font-bold text-emerald-900 mb-4">Exam Overview</h3>
         <div className="grid grid-cols-2 gap-4">
@@ -409,10 +413,19 @@ const TestInstructionsScreen = ({ onStart, onBack }: { onStart: () => void, onBa
         </p>
       </div>
     </div>
+
+    <div className="p-6 bg-white border-t border-gray-100">
+      <button 
+        onClick={onStart}
+        className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform"
+      >
+        Start Test
+      </button>
+    </div>
   </div>
 );
 
-const OnboardingScreen = ({ onLogin }: { onLogin: () => void }) => (
+const OnboardingScreen = ({ onLogin, onNavigate }: { onLogin: () => void, onNavigate: (s: Screen) => void }) => (
   <div className="h-screen bg-white flex flex-col p-6 justify-between overflow-hidden">
     <div className="mt-4 text-center">
       <div className="w-16 h-16 bg-emerald-100 rounded-3xl flex items-center justify-center mx-auto mb-4">
@@ -457,7 +470,7 @@ const OnboardingScreen = ({ onLogin }: { onLogin: () => void }) => (
       </button>
       
       <p className="text-[9px] text-center text-gray-400 px-4 leading-relaxed">
-        By continuing, you agree to our <button className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-1">Terms</button> and <button className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-1">Privacy</button>.
+        By continuing, you agree to our <button onClick={() => onNavigate('terms-of-service')} className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-1">Terms</button> and <button onClick={() => onNavigate('privacy-policy')} className="text-emerald-600 font-bold underline decoration-emerald-600/30 underline-offset-1">Privacy</button>.
       </p>
     </div>
   </div>
@@ -465,7 +478,7 @@ const OnboardingScreen = ({ onLogin }: { onLogin: () => void }) => (
 
 const DashboardScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
   <div className="pb-24 bg-gray-50/50 min-h-screen">
-    <Header onMenuClick={onMenuClick} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
     
     <div className="px-6 pt-4">
       {/* Countdown Card */}
@@ -557,59 +570,94 @@ const DashboardScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) 
   </div>
 );
 
-const TestListScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
-  <div className="pb-24">
-    <Header onMenuClick={onMenuClick} />
-    
-    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-30 border-b border-gray-50">
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-        {['All', 'Attempted', 'Unattempted', 'Locked'].map((filter, i) => (
-          <button 
-            key={i} 
-            className={cn(
-              "px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors",
-              i === 0 ? "bg-emerald-600 text-white" : "bg-gray-100 text-gray-500"
-            )}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
-    </div>
+const TestListScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+  const [activeFilter, setActiveFilter] = React.useState('All');
 
-    <div className="px-6 mt-4 space-y-3">
-      {MOCK_TESTS.map((test) => (
-        <Card 
-          key={test.id} 
-          className={cn("flex items-center justify-between", test.status === 'locked' && "opacity-60")}
-          onClick={() => {
-            if (test.status === 'available') onNavigate('test-instructions');
-            if (test.status === 'locked') onNavigate('pricing');
-          }}
+  const filteredTests = MOCK_TESTS.filter(test => {
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Attempted') return test.status === 'completed';
+    if (activeFilter === 'Unattempted') return test.status === 'available';
+    if (activeFilter === 'Locked') return test.status === 'locked';
+    return true;
+  });
+
+  return (
+    <div className="pb-24">
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      
+      {/* Promo Banner */}
+      <div className="px-6 pt-4">
+        <button 
+          onClick={() => onNavigate('pricing')}
+          className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 rounded-2xl flex items-center justify-between text-white shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-transform overflow-hidden relative"
         >
-          <div className="flex items-center gap-4">
-            <div className={cn(
-              "w-12 h-12 rounded-xl flex items-center justify-center",
-              test.status === 'completed' ? "bg-emerald-50 text-emerald-600" : 
-              test.status === 'available' ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-400"
-            )}>
-              {test.status === 'completed' ? <CheckCircle2 size={24} /> : 
-               test.status === 'available' ? <Play size={24} fill="currentColor" /> : <Lock size={24} />}
-            </div>
-            <div>
-              <h4 className="font-bold text-sm text-gray-900">{test.title}</h4>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] text-gray-500 font-medium">{test.questionsCount} Qs • {test.durationMinutes} Mins</span>
-                {test.score && <span className="text-[10px] font-bold text-emerald-600">Score: {test.score}</span>}
+          <div className="relative z-10 text-left">
+            <h4 className="font-black text-sm uppercase tracking-wider">Unlock All 30 Tests</h4>
+            <p className="text-[10px] font-bold text-emerald-100">Master NEET with full mock series for just ₹299</p>
+          </div>
+          <div className="relative z-10 bg-white/20 px-3 py-1 rounded-full text-[10px] font-black backdrop-blur-sm border border-white/20">
+            BUY NOW
+          </div>
+          <div className="absolute -right-4 -top-4 w-16 h-16 bg-white/10 rounded-full blur-xl" />
+        </button>
+      </div>
+
+      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-30 border-b border-gray-50">
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          {['All', 'Attempted', 'Unattempted', 'Locked'].map((filter) => (
+            <button 
+              key={filter} 
+              onClick={() => setActiveFilter(filter)}
+              className={cn(
+                "px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors",
+                activeFilter === filter ? "bg-emerald-600 text-white" : "bg-gray-100 text-gray-500"
+              )}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-6 mt-4 space-y-3">
+        {filteredTests.map((test) => (
+          <Card 
+            key={test.id} 
+            className={cn("flex items-center justify-between", test.status === 'locked' && "opacity-60")}
+            onClick={() => {
+              if (test.status === 'available' || test.status === 'completed') onNavigate('test-instructions');
+              if (test.status === 'locked') onNavigate('pricing');
+            }}
+          >
+            <div className="flex items-center gap-4">
+              <div className={cn(
+                "w-12 h-12 rounded-xl flex items-center justify-center",
+                test.status === 'completed' ? "bg-emerald-50 text-emerald-600" : 
+                test.status === 'available' ? "bg-blue-50 text-blue-600" : "bg-gray-100 text-gray-400"
+              )}>
+                {test.status === 'completed' ? <CheckCircle2 size={24} /> : 
+                 test.status === 'available' ? <Play size={24} fill="currentColor" /> : <Lock size={24} />}
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-gray-900">{test.title}</h4>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[10px] text-gray-500 font-medium">{test.questionsCount} Qs • {test.durationMinutes} Mins</span>
+                  {test.score && <span className="text-[10px] font-bold text-emerald-600">Score: {test.score}</span>}
+                </div>
               </div>
             </div>
+            <ChevronRight size={18} className="text-gray-300" />
+          </Card>
+        ))}
+        {filteredTests.length === 0 && (
+          <div className="py-20 text-center">
+            <p className="text-gray-400 font-bold text-sm">No tests found in this category.</p>
           </div>
-          <ChevronRight size={18} className="text-gray-300" />
-        </Card>
-      ))}
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
   const [currentQuestion, setCurrentQuestion] = React.useState(0);
@@ -662,38 +710,83 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
   const question = MOCK_QUESTIONS[currentQuestion % MOCK_QUESTIONS.length];
 
   if (isSubmitted) {
+    const score = Object.keys(userAnswers).length * 4; // Simplified score calculation for demo
+    const rank = predictNeetRank(score);
+    
     return (
-      <div className="fixed inset-0 bg-gray-50 z-[100] flex flex-col overflow-y-auto">
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+      <div className="fixed inset-0 bg-gray-50 z-[100] overflow-y-auto pb-24">
+        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
           <div className="flex items-center gap-4">
             <button onClick={onExit} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
               <ArrowLeft size={20} className="text-gray-600" />
             </button>
-            <h3 className="text-sm font-bold text-gray-900">Test Results & Solutions</h3>
+            <h3 className="text-sm font-bold text-gray-900">Detailed Analysis</h3>
           </div>
-          <button onClick={onExit} className="text-xs font-bold text-emerald-600">Close</button>
+          <button onClick={onExit} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+            <X size={20} className="text-gray-600" />
+          </button>
         </div>
 
         <div className="p-6 space-y-6 max-w-4xl mx-auto w-full">
-          {/* Analytics Summary */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="p-4 text-center">
-              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Score</p>
-              <p className="text-2xl font-black text-emerald-600">645/720</p>
-            </Card>
+          {/* Summary Card */}
+          <Card className="bg-emerald-600 text-white p-8 border-none shadow-xl shadow-emerald-500/20 relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <p className="text-emerald-100 text-[10px] font-bold uppercase tracking-widest mb-1">Final Score</p>
+                  <h2 className="text-5xl font-black italic">{score}<span className="text-xl opacity-50 font-bold"> / 720</span></h2>
+                </div>
+                <div className="bg-white/20 p-4 rounded-3xl backdrop-blur-md">
+                  <Award size={32} />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
+                  <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Predicted Rank</p>
+                  <p className="text-xl font-black">#{rank}</p>
+                </div>
+                <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
+                  <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Improvement</p>
+                  <p className="text-xl font-black">+14% <TrendingUp size={18} className="inline ml-1" /></p>
+                </div>
+              </div>
+            </div>
+            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+          </Card>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-4">
             <Card className="p-4 text-center">
               <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Accuracy</p>
-              <p className="text-2xl font-black text-blue-600">89%</p>
+              <p className="text-2xl font-black text-emerald-600">85%</p>
             </Card>
             <Card className="p-4 text-center">
-              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Rank</p>
-              <p className="text-2xl font-black text-amber-600">#1,240</p>
+              <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Speed</p>
+              <p className="text-2xl font-black text-blue-600">48s/q</p>
             </Card>
             <Card className="p-4 text-center">
               <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Time Taken</p>
               <p className="text-2xl font-black text-gray-900">2:45:12</p>
             </Card>
           </div>
+
+          {/* Performance Analysis */}
+          <Card className="p-6">
+            <h4 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <Activity size={18} className="text-emerald-600" />
+              Performance Improvement
+            </h4>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600 leading-relaxed">
+                You've shown significant improvement in <span className="font-bold text-emerald-600">Organic Chemistry</span> and <span className="font-bold text-emerald-600">Genetics</span> compared to your last test. However, your speed in <span className="font-bold text-red-600">Physics Mechanics</span> has decreased slightly.
+              </p>
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">AI Recommendation</p>
+                <p className="text-xs text-gray-700 font-medium">Focus on solving 50+ questions from Rotational Motion to boost your Physics score by an estimated 20-30 marks.</p>
+              </div>
+            </div>
+          </Card>
 
           {/* Solutions List */}
           <div className="space-y-4">
@@ -799,9 +892,10 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
         {[
           { name: 'Physics', start: 0 },
           { name: 'Chemistry', start: 50 },
-          { name: 'Biology', start: 100 },
+          { name: 'Botany', start: 100 },
+          { name: 'Zoology', start: 150 },
         ].map((section) => {
-          const isActive = currentQuestion >= section.start && currentQuestion < (section.start + 50 || 200);
+          const isActive = currentQuestion >= section.start && currentQuestion < (section.start + 50);
           return (
             <button
               key={section.name}
@@ -828,11 +922,8 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
           <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <span className="px-3 py-1 bg-gray-900 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                <span className="px-3 py-1 bg-gray-900 text-white text-[10px] font-bold rounded-full uppercase tracking-wider whitespace-nowrap">
                   Question {currentQuestion + 1}
-                </span>
-                <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full uppercase tracking-wider">
-                  {question.subject}
                 </span>
               </div>
               <div className="flex gap-2">
@@ -948,9 +1039,10 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
   );
 };
 
-const TestHistoryScreen = ({ onBack }: { onBack: () => void }) => (
+const TestHistoryScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-100 flex items-center gap-4">
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
       <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
         <ArrowLeft size={24} />
       </button>
@@ -989,7 +1081,10 @@ const TestHistoryScreen = ({ onBack }: { onBack: () => void }) => (
               <p className="text-[8px] font-bold text-gray-400 uppercase">Time</p>
             </div>
           </div>
-          <button className="w-full mt-4 py-2 bg-gray-50 text-emerald-600 rounded-xl text-xs font-bold active:bg-emerald-50 transition-colors">
+          <button 
+            onClick={() => onNavigate('test-analysis')}
+            className="w-full mt-4 py-2 bg-gray-50 text-emerald-600 rounded-xl text-xs font-bold active:bg-emerald-50 transition-colors"
+          >
             View Analytics & Solutions
           </button>
         </Card>
@@ -998,52 +1093,65 @@ const TestHistoryScreen = ({ onBack }: { onBack: () => void }) => (
   </div>
 );
 
-const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode }: { onBack: () => void, onNavigate: (s: Screen) => void, isDarkMode: boolean, toggleDarkMode: () => void }) => (
-  <div className="pb-24 bg-gray-50 min-h-screen">
-    <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-100 flex items-center gap-4">
-      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-        <ArrowLeft size={24} />
-      </button>
-      <h1 className="text-lg font-bold text-gray-900">Settings</h1>
-    </div>
+const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, isDarkMode: boolean, toggleDarkMode: () => void, onMenuClick: () => void }) => {
+  const [pushNotifications, setPushNotifications] = React.useState(true);
 
-    <div className="px-6 mt-6 space-y-6">
-      <section>
-        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Preference</h3>
-        <Card className="divide-y divide-gray-50 p-0 overflow-hidden">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-                {isDarkMode ? <Moon size={18} /> : <Sun size={18} />}
+  return (
+    <div className="pb-24 bg-gray-50 min-h-screen">
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
+        <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
+          <ArrowLeft size={24} />
+        </button>
+        <h1 className="text-lg font-bold text-gray-900">Settings</h1>
+      </div>
+
+      <div className="px-6 mt-6 space-y-6">
+        <section>
+          <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Preference</h3>
+          <Card className="divide-y divide-gray-50 p-0 overflow-hidden">
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                  {isDarkMode ? <Moon size={18} /> : <Sun size={18} />}
+                </div>
+                <span className="text-sm font-semibold text-gray-700">Dark Mode</span>
               </div>
-              <span className="text-sm font-semibold text-gray-700">Dark Mode</span>
+              <button 
+                onClick={toggleDarkMode}
+                className={cn(
+                  "w-12 h-6 rounded-full transition-colors relative",
+                  isDarkMode ? "bg-emerald-600" : "bg-gray-200"
+                )}
+              >
+                <div className={cn(
+                  "absolute top-1 w-4 h-4 bg-white rounded-full transition-transform",
+                  isDarkMode ? "left-7" : "left-1"
+                )} />
+              </button>
             </div>
-            <button 
-              onClick={toggleDarkMode}
-              className={cn(
-                "w-12 h-6 rounded-full transition-colors relative",
-                isDarkMode ? "bg-emerald-600" : "bg-gray-200"
-              )}
-            >
-              <div className={cn(
-                "absolute top-1 w-4 h-4 bg-white rounded-full transition-transform",
-                isDarkMode ? "left-7" : "left-1"
-              )} />
-            </button>
-          </div>
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-                <MessageCircle size={18} />
+            <div className="flex items-center justify-between p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                  <MessageCircle size={18} />
+                </div>
+                <span className="text-sm font-semibold text-gray-700">Push Notifications</span>
               </div>
-              <span className="text-sm font-semibold text-gray-700">Push Notifications</span>
+              <button 
+                onClick={() => setPushNotifications(!pushNotifications)}
+                className={cn(
+                  "w-12 h-6 rounded-full transition-colors relative",
+                  pushNotifications ? "bg-emerald-600" : "bg-gray-200"
+                )}
+              >
+                <div className={cn(
+                  "absolute top-1 w-4 h-4 bg-white rounded-full transition-transform",
+                  pushNotifications ? "left-7" : "left-1"
+                )} />
+              </button>
             </div>
-            <button className="w-12 h-6 rounded-full bg-emerald-600 relative">
-              <div className="absolute top-1 w-4 h-4 bg-white rounded-full left-7" />
-            </button>
-          </div>
-        </Card>
-      </section>
+          </Card>
+        </section>
 
       <section>
         <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">Account</h3>
@@ -1093,11 +1201,17 @@ const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode }: { on
       <section>
         <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 px-1">More</h3>
         <Card className="divide-y divide-gray-50 p-0 overflow-hidden">
-          <button className="w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => onNavigate('privacy-policy')}
+            className="w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors"
+          >
             <span className="text-sm font-semibold text-gray-700">Privacy Policy</span>
             <ChevronRight size={18} className="text-gray-300" />
           </button>
-          <button className="w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors">
+          <button 
+            onClick={() => onNavigate('terms-of-service')}
+            className="w-full flex items-center justify-between p-4 active:bg-gray-50 transition-colors"
+          >
             <span className="text-sm font-semibold text-gray-700">Terms of Service</span>
             <ChevronRight size={18} className="text-gray-300" />
           </button>
@@ -1109,32 +1223,160 @@ const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode }: { on
       </button>
     </div>
   </div>
-);
+  );
+};
 
-const FaqsScreen = ({ onBack }: { onBack: () => void }) => {
+const TestAnalysisScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+  const score = 645;
+  const rank = predictNeetRank(score);
+  const userAnswers: Record<number, number> = { 0: 3, 1: 1 }; // Mock answers for demo
+
+  return (
+    <div className="pb-24 bg-gray-50 min-h-screen overflow-y-auto">
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-[73px] z-50">
+        <div className="flex items-center gap-4">
+          <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
+            <ArrowLeft size={24} />
+          </button>
+          <h3 className="text-sm font-bold text-gray-900">Detailed Analysis</h3>
+        </div>
+        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+          <X size={20} className="text-gray-600" />
+        </button>
+      </div>
+
+      <div className="p-6 space-y-6 max-w-4xl mx-auto w-full">
+        {/* Summary Card */}
+        <Card className="bg-emerald-600 text-white p-8 border-none shadow-xl shadow-emerald-500/20 relative overflow-hidden">
+          <div className="relative z-10">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <p className="text-emerald-100 text-[10px] font-bold uppercase tracking-widest mb-1">Final Score</p>
+                <h2 className="text-5xl font-black italic">{score}<span className="text-xl opacity-50 font-bold"> / 720</span></h2>
+              </div>
+              <div className="bg-white/20 p-4 rounded-3xl backdrop-blur-md">
+                <Award size={32} />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
+                <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Predicted Rank</p>
+                <p className="text-xl font-black">#{rank}</p>
+              </div>
+              <div className="bg-white/10 p-4 rounded-2xl border border-white/10">
+                <p className="text-[10px] font-bold text-emerald-200 uppercase mb-1">Improvement</p>
+                <p className="text-xl font-black">+14% <TrendingUp size={18} className="inline ml-1" /></p>
+              </div>
+            </div>
+          </div>
+          <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+        </Card>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-4">
+          <Card className="p-4 text-center">
+            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Accuracy</p>
+            <p className="text-2xl font-black text-emerald-600">85%</p>
+          </Card>
+          <Card className="p-4 text-center">
+            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Speed</p>
+            <p className="text-2xl font-black text-blue-600">48s/q</p>
+          </Card>
+          <Card className="p-4 text-center">
+            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Time Taken</p>
+            <p className="text-2xl font-black text-gray-900">2:45:12</p>
+          </Card>
+        </div>
+
+        {/* Performance Analysis */}
+        <Card className="p-6">
+          <h4 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Activity size={18} className="text-emerald-600" />
+            Performance Improvement
+          </h4>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600 leading-relaxed">
+              You've shown significant improvement in <span className="font-bold text-emerald-600">Organic Chemistry</span> and <span className="font-bold text-emerald-600">Genetics</span> compared to your last test. However, your speed in <span className="font-bold text-red-600">Physics Mechanics</span> has decreased slightly.
+            </p>
+            <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+              <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">AI Recommendation</p>
+              <p className="text-xs text-gray-700 font-medium">Focus on solving 50+ questions from Rotational Motion to boost your Physics score by an estimated 20-30 marks.</p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Solutions List */}
+        <div className="space-y-4">
+          <h4 className="font-bold text-gray-900">Question-wise Solutions</h4>
+          {MOCK_QUESTIONS.map((q, idx) => {
+            const userAnswer = userAnswers[idx];
+            const isCorrect = userAnswer === q.correctOption;
+            const isUnanswered = userAnswer === undefined;
+
+            return (
+              <Card key={q.id} className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-[10px] font-bold px-2 py-1 bg-gray-100 text-gray-600 rounded uppercase">Question {idx + 1}</span>
+                  <span className={cn(
+                    "text-[10px] font-bold px-2 py-1 rounded uppercase",
+                    isCorrect ? "bg-emerald-50 text-emerald-600" : 
+                    isUnanswered ? "bg-gray-50 text-gray-400" : "bg-red-50 text-red-600"
+                  )}>
+                    {isCorrect ? 'Correct' : isUnanswered ? 'Unanswered' : 'Incorrect'}
+                  </span>
+                </div>
+                <p className="text-base font-medium text-gray-900 mb-4">{q.text}</p>
+                <div className="grid gap-2 mb-4">
+                  {q.options.map((opt, i) => (
+                    <div 
+                      key={i}
+                      className={cn(
+                        "p-3 rounded-xl border text-sm flex items-center gap-3",
+                        i === q.correctOption ? "border-emerald-200 bg-emerald-50 text-emerald-900" :
+                        i === userAnswer ? "border-red-200 bg-red-50 text-red-900" : "border-gray-100 bg-white text-gray-600"
+                      )}
+                    >
+                      <div className={cn(
+                        "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold",
+                        i === q.correctOption ? "bg-emerald-600 text-white" :
+                        i === userAnswer ? "bg-red-600 text-white" : "bg-gray-100 text-gray-400"
+                      )}>
+                        {String.fromCharCode(65 + i)}
+                      </div>
+                      <span className="font-medium">{opt}</span>
+                      {i === q.correctOption && <CheckCircle2 size={14} className="ml-auto text-emerald-600" />}
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Explanation</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">{q.explanation}</p>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const FaqsScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
   const [search, setSearch] = React.useState('');
   const [openIndex, setOpenIndex] = React.useState<number | null>(0);
 
   const faqs = [
     { q: "What is NEET Rank Booster?", a: "NEET Rank Booster is an AI-powered platform designed to help medical aspirants master mock tests and predict their ranks with high accuracy." },
-    { q: "How is the rank predicted?", a: "Our AI model analyzes your scores, accuracy, speed, and difficulty level of tests compared to previous years' NEET data to provide a realistic rank range." },
-    { q: "Can I take tests offline?", a: "Currently, our platform requires an active internet connection to sync your results and provide real-time analytics." },
-    { q: "Are the mock tests based on the latest NTA pattern?", a: "Yes, all our tests are strictly designed according to the latest NTA NEET exam pattern, including Section A and Section B." },
+    { q: "How is the rank predicted?", a: "Our AI model analyzes your scores, accuracy, speed, and difficulty level of tests compared to previous years' NEET data to provide a realistic rank range. Note: Your rank solely depends on your understanding of the subject and your performance in the actual exam." },
+    { q: "Can I get a refund?", a: "No, all purchases are non-refundable and subscriptions cannot be cancelled once activated." },
     { q: "How many mock tests are available in the Pro plan?", a: "The Pro plan gives you unlimited access to 30+ full-length mock tests and 100+ topic-wise practice tests." },
     { q: "What is the validity of the Pro plan?", a: "The Pro plan is valid until the date of the NEET 2026 entrance examination." },
-    { q: "Can I reset a test and take it again?", a: "Yes, you can retake any test as many times as you want to improve your score and speed." },
     { q: "Does the app provide solutions and explanations?", a: "Absolutely! After every test, you get detailed step-by-step solutions and conceptual explanations for every question." },
-    { q: "How can I track my progress?", a: "The Analytics dashboard provides a visual representation of your performance trends, subject-wise accuracy, and weak areas." },
-    { q: "Is there any negative marking in the tests?", a: "Yes, we follow the standard NEET marking scheme: +4 for correct and -1 for incorrect answers." },
-    { q: "Can I access the app on multiple devices?", a: "Yes, you can log in with your account on any device, but simultaneous sessions are limited for security." },
-    { q: "What if I face a technical issue during a test?", a: "Our app automatically saves your progress. You can resume the test from where you left off if the app closes unexpectedly." },
-    { q: "Are there any free mock tests?", a: "Yes, we offer 2 full-length mock tests and several practice questions for free to all users." },
     { q: "How do I upgrade to the Pro plan?", a: "You can upgrade by clicking the 'Upgrade to Pro' button in the side menu or by visiting the Subscription Plan page." },
-    { q: "What payment methods are supported?", a: "We support all major payment methods including UPI (Google Pay, PhonePe), Credit/Debit Cards, and Net Banking." },
-    { q: "Can I get a refund if I'm not satisfied?", a: "We offer a 24-hour no-questions-asked refund policy if you haven't attempted more than 2 premium tests." },
-    { q: "Does the app cover all three subjects?", a: "Yes, we provide comprehensive coverage for Physics, Chemistry, and Biology (Botany & Zoology)." },
-    { q: "Are there any video lectures available?", a: "Currently, we focus on high-quality testing and analytics. Video lectures are planned for future updates." },
-    { q: "How often are new tests added?", a: "We add new mock tests every week to keep the content fresh and aligned with current trends." },
+    { q: "What if I face a technical issue during a test?", a: "Our app automatically saves your progress. You can resume the test from where you left off if the app closes unexpectedly." },
+    { q: "Is there any negative marking in the tests?", a: "Yes, we follow the standard NEET marking scheme: +4 for correct and -1 for incorrect answers." },
     { q: "How can I contact support?", a: "You can reach out to us via the 'Help & Support' page in the app or email us at support@neetrankbooster.com." }
   ];
 
@@ -1142,7 +1384,8 @@ const FaqsScreen = ({ onBack }: { onBack: () => void }) => {
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-100">
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100">
         <div className="flex items-center gap-4 mb-4">
           <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
             <ArrowLeft size={24} />
@@ -1192,18 +1435,13 @@ const FaqsScreen = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-const HelpScreen = ({ onBack }: { onBack: () => void }) => {
+const HelpScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
   const [submitted, setSubmitted] = React.useState(false);
-
-  const contactOptions = [
-    { icon: MessageCircle, label: 'Live Chat', sub: 'Wait time: < 2 mins', color: 'bg-emerald-50 text-emerald-600' },
-    { icon: User, label: 'Email Support', sub: 'Response in 24 hours', color: 'bg-blue-50 text-blue-600' },
-    { icon: HelpCircle, label: 'Call Us', sub: 'Mon-Sat, 9am - 6pm', color: 'bg-amber-50 text-amber-600' },
-  ];
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-100 flex items-center gap-4">
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
         <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
           <ArrowLeft size={24} />
         </button>
@@ -1212,18 +1450,16 @@ const HelpScreen = ({ onBack }: { onBack: () => void }) => {
 
       <div className="px-6 mt-6 space-y-6">
         <div className="grid grid-cols-1 gap-3">
-          {contactOptions.map((opt, i) => (
-            <Card key={i} className="flex items-center gap-4 p-4 active:scale-[0.98] transition-transform cursor-pointer">
-              <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center", opt.color)}>
-                <opt.icon size={24} />
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-gray-900">{opt.label}</h4>
-                <p className="text-[10px] text-gray-500 font-medium">{opt.sub}</p>
-              </div>
-              <ChevronRight size={18} className="ml-auto text-gray-300" />
-            </Card>
-          ))}
+          <Card className="flex items-center gap-4 p-4">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-blue-50 text-blue-600">
+              <User size={24} />
+            </div>
+            <div>
+              <h4 className="font-bold text-sm text-gray-900">Email Support</h4>
+              <p className="text-[10px] text-gray-500 font-medium">Response in 24 hours</p>
+            </div>
+            <ChevronRight size={18} className="ml-auto text-gray-300" />
+          </Card>
         </div>
 
         <Card className="p-6">
@@ -1272,7 +1508,166 @@ const HelpScreen = ({ onBack }: { onBack: () => void }) => {
   );
 };
 
-const AnalyticsScreen = ({ onMenuClick }: { onMenuClick: () => void }) => {
+const PrivacyPolicyScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+  <div className="pb-24 bg-gray-50 min-h-screen">
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
+      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
+        <ArrowLeft size={24} />
+      </button>
+      <h1 className="text-lg font-bold text-gray-900">Privacy Policy</h1>
+    </div>
+    <div className="px-6 mt-6 space-y-8 pb-12">
+      <div className="bg-emerald-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden">
+        <div className="relative z-10">
+          <h2 className="text-2xl font-black mb-2">Your Privacy Matters</h2>
+          <p className="text-emerald-100 text-sm leading-relaxed">We are committed to protecting your personal data and your right to privacy.</p>
+        </div>
+        <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="space-y-6">
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+              <User size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">1. Information We Collect</h3>
+          </div>
+          <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
+            <p>We collect personal information that you voluntarily provide to us when you register on the App, express an interest in obtaining information about us or our products and services.</p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Personal Data: Name, email address, and profile picture.</li>
+              <li>Performance Data: Test scores, accuracy, speed, and rank predictions.</li>
+              <li>Device Data: IP address, browser type, and operating system.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+              <Activity size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">2. How We Use Your Data</h3>
+          </div>
+          <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
+            <p>We use personal information collected via our App for a variety of business purposes described below:</p>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>To facilitate account creation and logon process.</li>
+              <li>To provide you with personalized analytics and rank predictions.</li>
+              <li>To send you administrative information and marketing communications.</li>
+              <li>To protect our Services and for legal reasons.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
+              <Lock size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">3. Data Security</h3>
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process. However, please also remember that we cannot guarantee that the internet itself is 100% secure.
+          </p>
+        </section>
+
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
+              <HelpCircle size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">4. Contact Us</h3>
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            If you have questions or comments about this policy, you may email us at <span className="font-bold text-emerald-600">support@neetrankbooster.com</span>.
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+);
+
+const TermsOfServiceScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+  <div className="pb-24 bg-gray-50 min-h-screen">
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
+      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
+        <ArrowLeft size={24} />
+      </button>
+      <h1 className="text-lg font-bold text-gray-900">Terms of Service</h1>
+    </div>
+    <div className="px-6 mt-6 space-y-8 pb-12">
+      <div className="bg-gray-900 rounded-3xl p-8 text-white shadow-xl shadow-gray-900/20 relative overflow-hidden">
+        <div className="relative z-10">
+          <h2 className="text-2xl font-black mb-2">Terms of Use</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">Please read these terms carefully before using our platform.</p>
+        </div>
+        <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="space-y-6">
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+              <CheckCircle2 size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">1. Acceptance of Terms</h3>
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            By accessing or using NEET Rank Booster, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the service.
+          </p>
+        </section>
+
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
+              <Target size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">2. Performance Disclaimer</h3>
+          </div>
+          <div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 mb-4">
+            <p className="text-xs text-amber-900 font-bold leading-relaxed">
+              IMPORTANT: Your predicted rank and performance metrics are estimates based on our AI models. Your actual NEET rank solely depends on your understanding of the subject and your performance in the actual examination.
+            </p>
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            We do not guarantee any specific rank or score in the actual NEET exam.
+          </p>
+        </section>
+
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
+              <CreditCard size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">3. Subscriptions & Refunds</h3>
+          </div>
+          <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
+            <p>Certain parts of the Service are billed on a subscription basis. You will be billed in advance on a recurring or one-time basis.</p>
+            <p className="font-bold text-red-600">All payments made for the Pro Plan are non-refundable and cannot be cancelled once the subscription is activated.</p>
+          </div>
+        </section>
+
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-8 h-8 bg-gray-50 text-gray-600 rounded-xl flex items-center justify-center">
+              <ArrowLeft size={18} />
+            </div>
+            <h3 className="font-bold text-gray-900">4. User Accounts</h3>
+          </div>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            When you create an account with us, you must provide information that is accurate, complete, and current at all times. Failure to do so constitutes a breach of the Terms.
+          </p>
+        </section>
+      </div>
+    </div>
+  </div>
+);
+
+const AnalyticsScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
   const performanceData = [
     { name: 'Test 1', score: 420 },
     { name: 'Test 2', score: 480 },
@@ -1289,7 +1684,7 @@ const AnalyticsScreen = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
       
       <div className="px-6 mt-4 space-y-6">
         {/* Main Score Overview */}
@@ -1401,6 +1796,89 @@ const AnalyticsScreen = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
           <Card className="p-5">
             <h4 className="font-bold text-sm mb-4 flex items-center gap-2">
+              <Timer size={16} className="text-emerald-500" />
+              Avg Time per Question
+            </h4>
+            <div className="space-y-4">
+              {[
+                { subject: 'Physics', time: '92 sec', color: 'bg-amber-500' },
+                { subject: 'Chemistry', time: '54 sec', color: 'bg-blue-500' },
+                { subject: 'Biology', time: '31 sec', color: 'bg-emerald-500' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className={cn("w-2 h-2 rounded-full", item.color)} />
+                    <span className="text-xs font-bold text-gray-700">{item.subject}</span>
+                  </div>
+                  <span className="text-xs font-black text-gray-900">{item.time}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h4 className="font-bold text-sm mb-4 flex items-center gap-2">
+              <Layers size={16} className="text-purple-500" />
+              Chapter-Level Heatmap
+            </h4>
+            <div className="space-y-6">
+              {[
+                { 
+                  subject: 'Physics', 
+                  chapters: [
+                    { name: 'Mechanics', score: 65 },
+                    { name: 'Optics', score: 82 },
+                    { name: 'Modern Physics', score: 91 },
+                    { name: 'Thermodynamics', score: 45 }
+                  ] 
+                },
+                { 
+                  subject: 'Chemistry', 
+                  chapters: [
+                    { name: 'Organic', score: 88 },
+                    { name: 'Inorganic', score: 72 },
+                    { name: 'Physical', score: 79 }
+                  ] 
+                },
+                { 
+                  subject: 'Biology', 
+                  chapters: [
+                    { name: 'Genetics', score: 95 },
+                    { name: 'Ecology', score: 89 },
+                    { name: 'Human Phys.', score: 92 }
+                  ] 
+                },
+              ].map((sub, i) => (
+                <div key={i} className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{sub.subject}</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {sub.chapters.map((ch, j) => (
+                      <div 
+                        key={j} 
+                        className={cn(
+                          "p-3 rounded-xl border flex flex-col gap-1",
+                          ch.score > 85 ? "bg-emerald-50 border-emerald-100" :
+                          ch.score > 70 ? "bg-blue-50 border-blue-100" :
+                          "bg-amber-50 border-amber-100"
+                        )}
+                      >
+                        <span className="text-[10px] font-bold text-gray-900 truncate">{ch.name}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="h-1 flex-1 bg-black/5 rounded-full overflow-hidden mr-2">
+                            <div className="h-full bg-current opacity-50" style={{ width: `${ch.score}%` }} />
+                          </div>
+                          <span className="text-[8px] font-black">{ch.score}%</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <h4 className="font-bold text-sm mb-4 flex items-center gap-2">
               <Activity size={16} className="text-blue-500" />
               Subject Breakdown
             </h4>
@@ -1445,9 +1923,9 @@ const AnalyticsScreen = ({ onMenuClick }: { onMenuClick: () => void }) => {
   );
 };
 
-const FocusAreaScreen = ({ onMenuClick }: { onMenuClick: () => void }) => (
+const FocusAreaScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
   <div className="pb-24">
-    <Header onMenuClick={onMenuClick} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
     
     <div className="px-6 mt-4 space-y-6">
       <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
@@ -1491,7 +1969,7 @@ const FocusAreaScreen = ({ onMenuClick }: { onMenuClick: () => void }) => (
   </div>
 );
 
-const PricingScreen = ({ onBack }: { onBack: () => void }) => {
+const PricingScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
   const [isSuccess, setIsSuccess] = React.useState(false);
 
   if (isSuccess) {
@@ -1513,10 +1991,16 @@ const PricingScreen = ({ onBack }: { onBack: () => void }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-white z-[110] flex flex-col p-6">
-      <button onClick={onBack} className="mb-6 self-start"><ArrowLeft size={24} /></button>
+    <div className="pb-24 bg-gray-50 min-h-screen">
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
+        <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
+          <ArrowLeft size={24} />
+        </button>
+        <h1 className="text-lg font-bold text-gray-900">Subscription Plan</h1>
+      </div>
       
-      <div className="flex-1 overflow-y-auto no-scrollbar">
+      <div className="p-6 space-y-8">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Zap className="text-emerald-600" size={32} />
@@ -1525,42 +2009,52 @@ const PricingScreen = ({ onBack }: { onBack: () => void }) => {
           <p className="text-gray-500 text-sm">Get access to all 30 full-length mock tests and advanced analytics.</p>
         </div>
 
-        <div className="space-y-4 mb-8">
-          {[
-            '30 Full-Length Mock Tests',
-            'Real Exam Interface Simulation',
-            'AI-Powered Rank Prediction',
-            'Detailed Subject-wise Analysis',
-            'Weak Topic Detection',
-            'Valid till NEET 2026 Exam'
-          ].map((feat, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <CheckCircle2 size={20} className="text-emerald-600" />
-              <span className="text-sm text-gray-700 font-medium">{feat}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Special Offer</p>
-              <h3 className="text-3xl font-bold text-gray-900">₹299</h3>
-            </div>
-            <div className="text-right">
-              <p className="text-sm line-through text-gray-400">₹999</p>
-              <p className="text-xs font-bold text-emerald-600">70% OFF</p>
+        <div className="bg-gradient-to-br from-emerald-600 to-emerald-800 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-emerald-500/30 mb-8 relative overflow-hidden">
+          <div className="relative z-10">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-200 mb-4">Limited Time Offer</p>
+            <h3 className="text-5xl font-black mb-2 flex items-baseline gap-2">
+              ₹299
+              <span className="text-xl text-emerald-300/50 line-through font-bold">₹999</span>
+            </h3>
+            <p className="text-emerald-100 font-bold text-lg mb-6">That's less than ₹10 per test!</p>
+            
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+              <p className="text-xs font-medium leading-relaxed">
+                Join <span className="font-bold text-white">15,000+ aspirants</span> who improved their rank by an average of <span className="font-bold text-white">24%</span> using our Pro Mock Series.
+              </p>
             </div>
           </div>
+          <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+          <div className="absolute -left-12 -top-12 w-48 h-48 bg-emerald-400/20 rounded-full blur-3xl" />
         </div>
-      </div>
 
-      <div className="pt-4">
+        <div className="space-y-6 mb-12">
+          <h4 className="font-bold text-gray-900 text-lg px-2">Why Go Pro?</h4>
+          <div className="grid gap-4">
+            {[
+              { title: '30 Full Mock Tests', desc: 'Strictly based on latest NTA pattern', icon: BookOpen },
+              { title: 'AI Rank Predictor', desc: 'Know your standing among 20L+ students', icon: TrendingUp },
+              { title: 'Weak Topic Analysis', desc: 'Identify exactly where you lose marks', icon: Target },
+              { title: 'Step-by-Step Solutions', desc: 'Master concepts with detailed explanations', icon: Zap },
+            ].map((feat, i) => (
+              <div key={i} className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
+                  <feat.icon size={20} className="text-emerald-600" />
+                </div>
+                <div>
+                  <h5 className="font-bold text-sm text-gray-900">{feat.title}</h5>
+                  <p className="text-[10px] text-gray-500 font-medium">{feat.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <button 
           onClick={() => setIsSuccess(true)}
           className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform"
         >
-          Buy Now
+          Upgrade Now
         </button>
         <p className="text-center text-[10px] text-gray-400 mt-4">Secure payment via UPI, Cards, or NetBanking</p>
       </div>
@@ -1589,18 +2083,21 @@ export default function App() {
 
   const renderScreen = () => {
     switch (currentScreen) {
-      case 'onboarding': return <OnboardingScreen onLogin={handleLogin} />;
+      case 'onboarding': return <OnboardingScreen onLogin={handleLogin} onNavigate={setCurrentScreen} />;
       case 'dashboard': return <DashboardScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
       case 'test-list': return <TestListScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'test-instructions': return <TestInstructionsScreen onStart={() => setCurrentScreen('test-interface')} onBack={() => setCurrentScreen('test-list')} />;
+      case 'test-instructions': return <TestInstructionsScreen onStart={() => setCurrentScreen('test-interface')} onBack={() => setCurrentScreen('test-list')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
       case 'test-interface': return <TestInterfaceScreen onExit={() => setCurrentScreen('test-list')} />;
-      case 'analytics': return <AnalyticsScreen onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'focus-area': return <FocusAreaScreen onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'pricing': return <PricingScreen onBack={() => setCurrentScreen('test-list')} />;
-      case 'history': return <TestHistoryScreen onBack={() => setCurrentScreen('dashboard')} />;
-      case 'settings': return <SettingsScreen onNavigate={setCurrentScreen} onBack={() => setCurrentScreen('dashboard')} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} />;
-      case 'faqs': return <FaqsScreen onBack={() => setCurrentScreen('settings')} />;
-      case 'help': return <HelpScreen onBack={() => setCurrentScreen('settings')} />;
+      case 'analytics': return <AnalyticsScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'focus-area': return <FocusAreaScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'pricing': return <PricingScreen onBack={() => setCurrentScreen('test-list')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'history': return <TestHistoryScreen onBack={() => setCurrentScreen('dashboard')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'test-analysis': return <TestAnalysisScreen onBack={() => setCurrentScreen('history')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'settings': return <SettingsScreen onNavigate={setCurrentScreen} onBack={() => setCurrentScreen('dashboard')} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'faqs': return <FaqsScreen onBack={() => setCurrentScreen('settings')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'help': return <HelpScreen onBack={() => setCurrentScreen('settings')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'privacy-policy': return <PrivacyPolicyScreen onBack={() => setCurrentScreen(isLoggedIn ? 'settings' : 'onboarding')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'terms-of-service': return <TermsOfServiceScreen onBack={() => setCurrentScreen(isLoggedIn ? 'settings' : 'onboarding')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
       default: return <DashboardScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
     }
   };
@@ -1631,7 +2128,7 @@ export default function App() {
         </motion.div>
       </AnimatePresence>
 
-      {isLoggedIn && !['test-interface', 'test-instructions', 'pricing'].includes(currentScreen) && (
+      {isLoggedIn && currentScreen !== 'test-interface' && (
         <BottomNav activeTab={currentScreen} onTabChange={setCurrentScreen} />
       )}
     </div>

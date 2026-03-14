@@ -48,11 +48,12 @@ import {
   Cell
 } from 'recharts';
 import { motion, AnimatePresence } from 'motion/react';
+import { startGoogleLogin, performLogout as bridgeLogout } from './lib/authBridge';
 import { cn, predictNeetRank, getDaysLeft } from './lib/utils';
 
 // --- Types ---
 
-type Screen = 'onboarding' | 'dashboard' | 'test-list' | 'test-instructions' | 'test-interface' | 'analytics' | 'focus-area' | 'pricing' | 'history' | 'settings' | 'faqs' | 'help' | 'privacy-policy' | 'terms-of-service' | 'test-analysis';
+type Screen = 'onboarding' | 'dashboard' | 'test-list' | 'test-instructions' | 'test-interface' | 'analytics' | 'focus-area' | 'pricing' | 'history' | 'settings' | 'faqs' | 'help' | 'privacy-policy' | 'terms-of-service' | 'test-analysis' | 'post-login';
 
 interface Question {
   id: number;
@@ -116,7 +117,7 @@ const MOCK_QUESTIONS: Question[] = [
 
 // --- Components ---
 
-const Header = ({ onMenuClick, onNavigate }: { onMenuClick: () => void, onNavigate?: (s: Screen) => void }) => (
+const Header = ({ onMenuClick, onNavigate, user }: { onMenuClick: () => void, onNavigate?: (s: Screen) => void, user?: any }) => (
   <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-50 flex justify-between items-center">
     <div className="flex items-center gap-3">
       <button onClick={onMenuClick} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
@@ -133,7 +134,7 @@ const Header = ({ onMenuClick, onNavigate }: { onMenuClick: () => void, onNaviga
       onClick={() => onNavigate?.('settings')}
       className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 overflow-hidden active:scale-95 transition-transform"
     >
-      <img src="https://picsum.photos/seed/user/100/100" alt="Profile" referrerPolicy="no-referrer" />
+      <img src={user?.photo ? `https://api-neetrankbooster.interviewmania.com${user.photo}` : "https://picsum.photos/seed/user/100/100"} alt="Profile" referrerPolicy="no-referrer" />
     </button>
   </div>
 );
@@ -144,14 +145,16 @@ const SideMenu = ({
   onNavigate, 
   onLogout,
   isDarkMode,
-  toggleDarkMode
+  toggleDarkMode,
+  user
 }: { 
   isOpen: boolean, 
   onClose: () => void, 
   onNavigate: (s: Screen) => void,
   onLogout: () => void,
   isDarkMode: boolean,
-  toggleDarkMode: () => void
+  toggleDarkMode: () => void,
+  user?: any
 }) => {
   const [isPro, setIsPro] = React.useState(false); // Toggle for demo purposes
 
@@ -194,17 +197,17 @@ const SideMenu = ({
                   "w-12 h-12 rounded-xl overflow-hidden shadow-sm border shrink-0",
                   isDarkMode ? "bg-gray-800 border-gray-700" : "bg-gray-100 border-gray-100"
                 )}>
-                  <img src="https://picsum.photos/seed/user/100/100" alt="Profile" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                  <img src={user?.photo ? `https://api-neetrankbooster.interviewmania.com${user.photo}` : "https://picsum.photos/seed/user/100/100"} alt="Profile" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h2 className={cn(
                     "text-base font-bold truncate",
                     isDarkMode ? "text-white" : "text-gray-900"
-                  )}>Aman Sharma</h2>
+                  )}>{user?.name || "Aman Sharma"}</h2>
                   <p className={cn(
                     "text-[10px] font-medium leading-tight",
                     isDarkMode ? "text-gray-400" : "text-gray-500"
-                  )}>aman.sharma@example.com</p>
+                  )}>{user?.email || "aman.sharma@example.com"}</p>
                   
                   <div className={cn(
                     "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider border w-fit mt-1",
@@ -348,9 +351,9 @@ const Card = ({ children, className, ...props }: React.ComponentProps<'div'>) =>
 
 // --- Screens ---
 
-const TestInstructionsScreen = ({ onStart, onBack, onNavigate, onMenuClick }: { onStart: () => void, onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+const TestInstructionsScreen = ({ onStart, onBack, onNavigate, onMenuClick, user }: { onStart: () => void, onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
     <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
       <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
         <ArrowLeft size={24} />
@@ -476,9 +479,9 @@ const OnboardingScreen = ({ onLogin, onNavigate }: { onLogin: () => void, onNavi
   </div>
 );
 
-const DashboardScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+const DashboardScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50/50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
     
     <div className="px-6 pt-4">
       {/* Countdown Card */}
@@ -570,7 +573,7 @@ const DashboardScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) 
   </div>
 );
 
-const TestListScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+const TestListScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => {
   const [activeFilter, setActiveFilter] = React.useState('All');
 
   const filteredTests = MOCK_TESTS.filter(test => {
@@ -583,7 +586,7 @@ const TestListScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) =
 
   return (
     <div className="pb-24">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
       
       {/* Promo Banner */}
       <div className="px-6 pt-4">
@@ -1039,9 +1042,9 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
   );
 };
 
-const TestHistoryScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+const TestHistoryScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
     <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
       <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
         <ArrowLeft size={24} />
@@ -1093,12 +1096,12 @@ const TestHistoryScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => 
   </div>
 );
 
-const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, isDarkMode: boolean, toggleDarkMode: () => void, onMenuClick: () => void }) => {
+const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, isDarkMode: boolean, toggleDarkMode: () => void, onMenuClick: () => void, user?: any }) => {
   const [pushNotifications, setPushNotifications] = React.useState(true);
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
       <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
         <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
           <ArrowLeft size={24} />
@@ -1226,14 +1229,14 @@ const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode, onMenu
   );
 };
 
-const TestAnalysisScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+const TestAnalysisScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => {
   const score = 645;
   const rank = predictNeetRank(score);
   const userAnswers: Record<number, number> = { 0: 3, 1: 1 }; // Mock answers for demo
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen overflow-y-auto">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-[73px] z-50">
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
@@ -1363,7 +1366,7 @@ const TestAnalysisScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () =>
   );
 };
 
-const FaqsScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+const FaqsScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => {
   const [search, setSearch] = React.useState('');
   const [openIndex, setOpenIndex] = React.useState<number | null>(0);
 
@@ -1384,7 +1387,7 @@ const FaqsScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, o
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
       <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100">
         <div className="flex items-center gap-4 mb-4">
           <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
@@ -1435,12 +1438,12 @@ const FaqsScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, o
   );
 };
 
-const HelpScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+const HelpScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => {
   const [submitted, setSubmitted] = React.useState(false);
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
       <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
         <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
           <ArrowLeft size={24} />
@@ -1508,9 +1511,9 @@ const HelpScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, o
   );
 };
 
-const PrivacyPolicyScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+const PrivacyPolicyScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
     <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
       <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
         <ArrowLeft size={24} />
@@ -1590,9 +1593,9 @@ const PrivacyPolicyScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () =
   </div>
 );
 
-const TermsOfServiceScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+const TermsOfServiceScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
     <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
       <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
         <ArrowLeft size={24} />
@@ -1667,7 +1670,68 @@ const TermsOfServiceScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () 
   </div>
 );
 
-const AnalyticsScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+const PostLoginScreen = ({ onNavigate, user }: { onNavigate: (s: Screen) => void, user?: any }) => {
+  React.useEffect(() => {
+    // Automatically navigate to dashboard after a short delay
+    const timer = setTimeout(() => {
+      onNavigate('dashboard');
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [onNavigate]);
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
+      <motion.div 
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-8"
+      >
+        <CheckCircle2 size={48} />
+      </motion.div>
+      
+      <motion.h1 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="text-3xl font-black text-gray-900 text-center mb-4"
+      >
+        Welcome Back!
+      </motion.h1>
+      
+      <motion.p 
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="text-gray-500 text-center mb-12 leading-relaxed"
+      >
+        {user?.name || 'User'}, you have successfully logged in. <br />
+        Preparing your personalized dashboard...
+      </motion.p>
+
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+        className="flex items-center gap-2 text-emerald-600 font-bold"
+      >
+        <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+        <span>Redirecting...</span>
+      </motion.div>
+
+      <motion.button
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.7 }}
+        onClick={() => onNavigate('dashboard')}
+        className="mt-12 text-sm text-gray-400 underline underline-offset-4"
+      >
+        Click here if not redirected
+      </motion.button>
+    </div>
+  );
+};
+
+const AnalyticsScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => {
   const performanceData = [
     { name: 'Test 1', score: 420 },
     { name: 'Test 2', score: 480 },
@@ -1684,7 +1748,7 @@ const AnalyticsScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) 
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
       
       <div className="px-6 mt-4 space-y-6">
         {/* Main Score Overview */}
@@ -1923,9 +1987,9 @@ const AnalyticsScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) 
   );
 };
 
-const FocusAreaScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) => void, onMenuClick: () => void }) => (
+const FocusAreaScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
     
     <div className="px-6 mt-4 space-y-6">
       <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
@@ -1969,7 +2033,7 @@ const FocusAreaScreen = ({ onNavigate, onMenuClick }: { onNavigate: (s: Screen) 
   </div>
 );
 
-const PricingScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void }) => {
+const PricingScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => {
   const [isSuccess, setIsSuccess] = React.useState(false);
 
   if (isSuccess) {
@@ -1992,7 +2056,7 @@ const PricingScreen = ({ onBack, onNavigate, onMenuClick }: { onBack: () => void
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
       <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
         <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
           <ArrowLeft size={24} />
@@ -2069,38 +2133,73 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const [isCheckingSession, setIsCheckingSession] = React.useState(true);
+  const [user, setUser] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('https://api-neetrankbooster.interviewmania.com/auth/check', {
+          credentials: 'include',
+        });
+        const data = await response.json();
+        
+        if (data.success && data.code === 'SESSION_ACTIVE') {
+          setIsLoggedIn(true);
+          setUser(data.user);
+          setCurrentScreen('post-login');
+          if (data.settings && data.settings.dark_mode === '1') {
+            setIsDarkMode(true);
+          }
+        }
+      } catch (error) {
+        console.error('Session check failed:', error);
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+
+    checkSession();
+  }, []);
 
   const handleLogin = () => {
-    setIsLoggedIn(true);
-    setCurrentScreen('dashboard');
+    startGoogleLogin();
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setCurrentScreen('onboarding');
-    setIsMenuOpen(false);
+    bridgeLogout();
   };
 
   const renderScreen = () => {
     switch (currentScreen) {
       case 'onboarding': return <OnboardingScreen onLogin={handleLogin} onNavigate={setCurrentScreen} />;
-      case 'dashboard': return <DashboardScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'test-list': return <TestListScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'test-instructions': return <TestInstructionsScreen onStart={() => setCurrentScreen('test-interface')} onBack={() => setCurrentScreen('test-list')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'dashboard': return <DashboardScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'test-list': return <TestListScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'test-instructions': return <TestInstructionsScreen onStart={() => setCurrentScreen('test-interface')} onBack={() => setCurrentScreen('test-list')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
       case 'test-interface': return <TestInterfaceScreen onExit={() => setCurrentScreen('test-list')} />;
-      case 'analytics': return <AnalyticsScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'focus-area': return <FocusAreaScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'pricing': return <PricingScreen onBack={() => setCurrentScreen('test-list')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'history': return <TestHistoryScreen onBack={() => setCurrentScreen('dashboard')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'test-analysis': return <TestAnalysisScreen onBack={() => setCurrentScreen('history')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'settings': return <SettingsScreen onNavigate={setCurrentScreen} onBack={() => setCurrentScreen('dashboard')} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'faqs': return <FaqsScreen onBack={() => setCurrentScreen('settings')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'help': return <HelpScreen onBack={() => setCurrentScreen('settings')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'privacy-policy': return <PrivacyPolicyScreen onBack={() => setCurrentScreen(isLoggedIn ? 'settings' : 'onboarding')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      case 'terms-of-service': return <TermsOfServiceScreen onBack={() => setCurrentScreen(isLoggedIn ? 'settings' : 'onboarding')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
-      default: return <DashboardScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} />;
+      case 'analytics': return <AnalyticsScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'focus-area': return <FocusAreaScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'pricing': return <PricingScreen onBack={() => setCurrentScreen('test-list')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'history': return <TestHistoryScreen onBack={() => setCurrentScreen('dashboard')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'test-analysis': return <TestAnalysisScreen onBack={() => setCurrentScreen('history')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'settings': return <SettingsScreen onNavigate={setCurrentScreen} onBack={() => setCurrentScreen('dashboard')} isDarkMode={isDarkMode} toggleDarkMode={() => setIsDarkMode(!isDarkMode)} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'faqs': return <FaqsScreen onBack={() => setCurrentScreen('settings')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'help': return <HelpScreen onBack={() => setCurrentScreen('settings')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'privacy-policy': return <PrivacyPolicyScreen onBack={() => setCurrentScreen(isLoggedIn ? 'settings' : 'onboarding')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'terms-of-service': return <TermsOfServiceScreen onBack={() => setCurrentScreen(isLoggedIn ? 'settings' : 'onboarding')} onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
+      case 'post-login': return <PostLoginScreen onNavigate={setCurrentScreen} user={user} />;
+      default: return <DashboardScreen onNavigate={setCurrentScreen} onMenuClick={() => setIsMenuOpen(true)} user={user} />;
     }
   };
+
+  if (isCheckingSession) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white">
+        <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+        <p className="text-emerald-600 font-medium animate-pulse">Checking session...</p>
+      </div>
+    );
+  }
 
   return (
     <div className={cn(
@@ -2114,6 +2213,7 @@ export default function App() {
         onLogout={handleLogout}
         isDarkMode={isDarkMode}
         toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+        user={user}
       />
 
       <AnimatePresence mode="wait">

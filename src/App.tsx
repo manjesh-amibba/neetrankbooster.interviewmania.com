@@ -117,7 +117,7 @@ const MOCK_QUESTIONS: Question[] = [
 
 // --- Components ---
 
-const Header = ({ onMenuClick, onNavigate, user }: { onMenuClick: () => void, onNavigate?: (s: Screen) => void, user?: any }) => (
+const Header = ({ onMenuClick, onNavigate, user, title = "NEET Rank Booster" }: { onMenuClick: () => void, onNavigate?: (s: Screen) => void, user?: any, title?: string }) => (
   <div className="bg-white px-6 pt-6 pb-4 sticky top-0 z-40 border-b border-gray-50 flex justify-between items-center">
     <div className="flex items-center gap-3">
       <button onClick={onMenuClick} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
@@ -127,7 +127,7 @@ const Header = ({ onMenuClick, onNavigate, user }: { onMenuClick: () => void, on
         onClick={() => onNavigate?.('dashboard')}
         className="text-lg font-bold text-gray-900 active:opacity-70 transition-opacity"
       >
-        NEET Rank Booster
+        {title}
       </button>
     </div>
     <button 
@@ -352,16 +352,10 @@ const Card = ({ children, className, ...props }: React.ComponentProps<'div'>) =>
 // --- Screens ---
 
 const TestInstructionsScreen = ({ onStart, onBack, onNavigate, onMenuClick, user }: { onStart: () => void, onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
-  <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
-    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
-      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-        <ArrowLeft size={24} />
-      </button>
-      <h1 className="text-lg font-bold text-gray-900">Test Instructions</h1>
-    </div>
+  <div className="flex flex-col bg-gray-50 min-h-screen">
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Test Instruction" />
 
-    <div className="flex-1 overflow-y-auto p-6 space-y-6">
+    <div className="flex-1 overflow-y-auto p-6 space-y-6 pb-32">
       <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
         <h3 className="font-bold text-emerald-900 mb-4">Exam Overview</h3>
         <div className="grid grid-cols-2 gap-4">
@@ -417,7 +411,7 @@ const TestInstructionsScreen = ({ onStart, onBack, onNavigate, onMenuClick, user
       </div>
     </div>
 
-    <div className="p-6 bg-white border-t border-gray-100">
+    <div className="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-gray-100 z-50">
       <button 
         onClick={onStart}
         className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-emerald-600/20 active:scale-95 transition-transform"
@@ -481,7 +475,7 @@ const OnboardingScreen = ({ onLogin, onNavigate }: { onLogin: () => void, onNavi
 
 const DashboardScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50/50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Dashboard" />
     
     <div className="px-6 pt-4">
       {/* Countdown Card */}
@@ -586,7 +580,7 @@ const TestListScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Scr
 
   return (
     <div className="pb-24">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Mock Tests" />
       
       {/* Promo Banner */}
       <div className="px-6 pt-4">
@@ -719,12 +713,7 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
     return (
       <div className="fixed inset-0 bg-gray-50 z-[100] overflow-y-auto pb-24">
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-          <div className="flex items-center gap-4">
-            <button onClick={onExit} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-              <ArrowLeft size={20} className="text-gray-600" />
-            </button>
-            <h3 className="text-sm font-bold text-gray-900">Detailed Analysis</h3>
-          </div>
+          <h3 className="text-sm font-bold text-gray-900">Detailed Analysis</h3>
           <button onClick={onExit} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
             <X size={20} className="text-gray-600" />
           </button>
@@ -852,10 +841,6 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
       {/* Header - Clean & Focused */}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-4">
-          <button onClick={onExit} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-            <ArrowLeft size={20} className="text-gray-600" />
-          </button>
-          <div className="h-8 w-[1px] bg-gray-200" />
           <div>
             <h3 className="text-sm font-bold text-gray-900">Full Mock Test 02</h3>
             <div className="flex items-center gap-2 text-emerald-600">
@@ -1044,13 +1029,7 @@ const TestInterfaceScreen = ({ onExit }: { onExit: () => void }) => {
 
 const TestHistoryScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
-    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
-      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-        <ArrowLeft size={24} />
-      </button>
-      <h1 className="text-lg font-bold text-gray-900">Test History</h1>
-    </div>
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Test History" />
     
     <div className="px-6 mt-6 space-y-4">
       {MOCK_TESTS.filter(t => t.status === 'completed').map((test) => (
@@ -1101,13 +1080,7 @@ const SettingsScreen = ({ onBack, onNavigate, isDarkMode, toggleDarkMode, onMenu
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
-      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
-        <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-lg font-bold text-gray-900">Settings</h1>
-      </div>
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Settings" />
 
       <div className="px-6 mt-6 space-y-6">
         <section>
@@ -1236,14 +1209,9 @@ const TestAnalysisScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack:
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen overflow-y-auto">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Detailed Analysis" />
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-[73px] z-50">
-        <div className="flex items-center gap-4">
-          <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-            <ArrowLeft size={24} />
-          </button>
-          <h3 className="text-sm font-bold text-gray-900">Detailed Analysis</h3>
-        </div>
+        <div className="w-1" />
         <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
           <X size={20} className="text-gray-600" />
         </button>
@@ -1387,14 +1355,8 @@ const FaqsScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => v
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="FAQs" />
       <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100">
-        <div className="flex items-center gap-4 mb-4">
-          <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-            <ArrowLeft size={24} />
-          </button>
-          <h1 className="text-lg font-bold text-gray-900">FAQs</h1>
-        </div>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input 
@@ -1443,13 +1405,7 @@ const HelpScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => v
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
-      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
-        <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-lg font-bold text-gray-900">Help & Support</h1>
-      </div>
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Help & Support" />
 
       <div className="px-6 mt-6 space-y-6">
         <div className="grid grid-cols-1 gap-3">
@@ -1513,13 +1469,7 @@ const HelpScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => v
 
 const PrivacyPolicyScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
-    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
-      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-        <ArrowLeft size={24} />
-      </button>
-      <h1 className="text-lg font-bold text-gray-900">Privacy Policy</h1>
-    </div>
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Privacy Policy" />
     <div className="px-6 mt-6 space-y-8 pb-12">
       <div className="bg-emerald-600 rounded-3xl p-8 text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden">
         <div className="relative z-10">
@@ -1595,13 +1545,7 @@ const PrivacyPolicyScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack
 
 const TermsOfServiceScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () => void, onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24 bg-gray-50 min-h-screen">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
-    <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
-      <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-        <ArrowLeft size={24} />
-      </button>
-      <h1 className="text-lg font-bold text-gray-900">Terms of Service</h1>
-    </div>
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Terms of Service" />
     <div className="px-6 mt-6 space-y-8 pb-12">
       <div className="bg-gray-900 rounded-3xl p-8 text-white shadow-xl shadow-gray-900/20 relative overflow-hidden">
         <div className="relative z-10">
@@ -1748,7 +1692,7 @@ const AnalyticsScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Sc
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="My Profile" />
       
       <div className="px-6 mt-4 space-y-6">
         {/* Main Score Overview */}
@@ -1989,7 +1933,7 @@ const AnalyticsScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Sc
 
 const FocusAreaScreen = ({ onNavigate, onMenuClick, user }: { onNavigate: (s: Screen) => void, onMenuClick: () => void, user?: any }) => (
   <div className="pb-24">
-    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
+    <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Focus Areas" />
     
     <div className="px-6 mt-4 space-y-6">
       <div className="bg-emerald-50 p-6 rounded-3xl border border-emerald-100">
@@ -2056,13 +2000,7 @@ const PricingScreen = ({ onBack, onNavigate, onMenuClick, user }: { onBack: () =
 
   return (
     <div className="pb-24 bg-gray-50 min-h-screen">
-      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} />
-      <div className="bg-white px-6 pt-4 pb-4 sticky top-[73px] z-40 border-b border-gray-100 flex items-center gap-4">
-        <button onClick={onBack} className="p-1 -ml-1 text-gray-600 active:scale-95 transition-transform">
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-lg font-bold text-gray-900">Subscription Plan</h1>
-      </div>
+      <Header onMenuClick={onMenuClick} onNavigate={onNavigate} user={user} title="Pro Plan" />
       
       <div className="p-6 space-y-8">
         <div className="text-center mb-8">

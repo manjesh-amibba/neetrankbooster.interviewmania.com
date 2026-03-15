@@ -2,25 +2,42 @@
 declare global {
   interface Window {
     Android?: {
-      startGoogleLogin: () => void;
-      performLogout: () => void;
+      googleLogin: () => void;
+      logout: () => void;
     };
   }
 }
 
-export const startGoogleLogin = () => {
-  if (window.Android && typeof window.Android.startGoogleLogin === 'function') {
-    window.Android.startGoogleLogin();
+export const startGoogleLogin = async () => {
+  if (window.Android && typeof window.Android.googleLogin === 'function') {
+    window.Android.googleLogin();
   } else {
-    // For non-Android users, use JavaScript-based redirect to Google login
-    window.location.href = 'https://api-neetrankbooster.interviewmania.com/auth/google';
+    try {
+      const response = await fetch('https://api-neetrankbooster.interviewmania.com/auth/test-login', {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   }
 };
 
-export const performLogout = () => {
-  if (window.Android && typeof window.Android.performLogout === 'function') {
-    window.Android.performLogout();
+export const performLogout = async () => {
+  if (window.Android && typeof window.Android.logout === 'function') {
+    window.Android.logout();
   } else {
-    console.log('Android bridge not found.');
+    try {
+      await fetch('https://api-neetrankbooster.interviewmania.com/auth/logout', {
+        credentials: 'include',
+      });
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Fallback redirect even if API fails
+      window.location.href = '/';
+    }
   }
 };

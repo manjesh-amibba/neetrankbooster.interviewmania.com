@@ -2075,6 +2075,10 @@ export default function App() {
   const [user, setUser] = React.useState<any>(null);
 
   React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentScreen]);
+
+  React.useEffect(() => {
     const checkSession = async () => {
       try {
         const response = await fetch('https://api-neetrankbooster.interviewmania.com/auth/check', {
